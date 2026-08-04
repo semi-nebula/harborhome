@@ -3254,6 +3254,35 @@
       .cloud-profile-button { width:32px; height:32px; }
     }
 
+
+    /* Mobile focus form fix — plus button should be compact, not full-width. */
+    html.mobile-shell .focus-form {
+      display:grid !important;
+      grid-template-columns:minmax(0,1fr) 38px !important;
+      gap:7px !important;
+      align-items:center !important;
+    }
+    html.mobile-shell .focus-form input {
+      min-width:0 !important;
+      width:100% !important;
+    }
+    html.mobile-shell .focus-form .button,
+    html.mobile-shell .focus-form button {
+      width:38px !important;
+      min-width:38px !important;
+      height:36px !important;
+      min-height:36px !important;
+      padding:0 !important;
+      border-radius:11px !important;
+      font-size:18px !important;
+      line-height:1 !important;
+    }
+    @media (max-width:360px) {
+      html.mobile-shell .focus-form { grid-template-columns:minmax(0,1fr) 36px !important; }
+      html.mobile-shell .focus-form .button,
+      html.mobile-shell .focus-form button { width:36px !important; min-width:36px !important; height:34px !important; min-height:34px !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -6066,5 +6095,5 @@
       initTemplatePicker(); applyState(); initFirebaseBackup().catch(() => {}); maybeShowOnboarding(); setInterval(updateClock, 1000); setInterval(tickTimer, 1000);
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2615ac17dbbcd03',t:'MTc4NTg4NjI3NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2616af71f1a162a',t:'MTc4NTg4NjkzOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
