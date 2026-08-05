@@ -1348,10 +1348,37 @@
         });
         if (changed) { saveState(); renderLinks(); }
       }
+      function launchDesktopApp(schemeUrl) {
+        const target = String(schemeUrl || '').trim();
+        if (!target) return;
+        // Try to open the OS-registered protocol via a hidden iframe so the
+        // dashboard never navigates away. If the app is installed, the browser
+        // shows "Open <app>?" and launches it (the window blurs). If not, we
+        // notice nothing happened and tell the user.
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.tabIndex = -1;
+        document.body.appendChild(iframe);
+        let launched = false;
+        const onBlur = () => { launched = true; cleanup(); };
+        const cleanup = () => {
+          window.removeEventListener('blur', onBlur);
+          setTimeout(() => iframe.remove(), 1500);
+        };
+        window.addEventListener('blur', onBlur);
+        setTimeout(() => {
+          if (!launched) {
+            cleanup();
+            showToast("\u201c" + target.split(":")[0] + "\u201d didn\u2019t open. Make sure the app is installed and supports a link protocol.");
+          }
+        }, 1400);
+        try { iframe.src = target; } catch (error) { cleanup(); showToast('Could not launch that app.'); }
+      }
       function renderLinks() {
         const grid = $('#links-grid');
         const linkTiles = activeSpace().links.map(link => `
-          <div class="link-tile" draggable="${editing}" data-link-id="${escapeHTML(link.id)}" data-link-url="${escapeHTML(link.url)}" role="link" tabindex="0" title="Open ${escapeHTML(link.name)}">
+          <div class="link-tile ${link.type === 'app' ? 'app-tile' : ''}" draggable="${editing}" data-link-id="${escapeHTML(link.id)}" data-link-url="${escapeHTML(link.url)}" data-link-type="${escapeHTML(link.type || 'web')}" data-app-launch="${escapeHTML(link.appLaunch || 'browser')}" role="link" tabindex="0" title="${link.type === 'app' ? 'Open app ' + escapeHTML(link.name) : 'Open ' + escapeHTML(link.name)}">
             <span class="link-icon" style="--link-color:${escapeHTML(link.color || '#b9e4d5')}">${linkIconMarkup(link)}</span>
             <span class="link-name">${escapeHTML(link.name)}</span>
             <button class="link-edit" type="button" data-edit-link="${escapeHTML(link.id)}" aria-label="Edit ${escapeHTML(link.name)}">✎</button>
@@ -2062,7 +2089,15 @@
         $('#link-add-tile').addEventListener('click', openLinkDialog);
         let draggedId = null;
         document.querySelectorAll('.link-tile[data-link-id]').forEach(tile => {
-          const openLink = () => { if (!editing) window.open(tile.dataset.linkUrl, '_blank', 'noopener,noreferrer'); };
+          const openLink = () => {
+            if (editing) return;
+            const url = tile.dataset.linkUrl;
+            if (tile.dataset.linkType === 'app' && tile.dataset.appLaunch === 'desktop') {
+              launchDesktopApp(url);
+              return;
+            }
+            window.open(url, '_blank', 'noopener,noreferrer');
+          };
           tile.addEventListener('click', event => { if (editing) { event.preventDefault(); return; } openLink(); });
           tile.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && !editing) { event.preventDefault(); openLink(); } });
           tile.addEventListener('dragstart', event => { if (!editing) return; draggedId = tile.dataset.linkId; tile.classList.add('dragging'); event.dataTransfer.effectAllowed = 'move'; });
@@ -2077,6 +2112,37 @@
         });
       }
       let linkEmojiDirty = false;
+      function linkDialogType() { return $('#link-type-app').classList.contains('active') ? 'app' : 'web'; }
+      function linkLaunchMode() { return $('#link-launch-desktop').classList.contains('active') ? 'desktop' : 'browser'; }
+      function setLinkLaunch(mode) {
+        const isDesktop = mode === 'desktop';
+        $('#link-launch-desktop').classList.toggle('active', isDesktop);
+        $('#link-launch-browser').classList.toggle('active', !isDesktop);
+        const url = $('#link-url');
+        const label = $('#link-url-label');
+        const note = $('#app-open-note');
+        const logoField = $('#link-favicon-url').closest('.field');
+        if (isDesktop) {
+          url.placeholder = 'e.g. localsend://, openboard://, spotify:, zoommtg:';
+          if (label) label.textContent = 'App protocol link';
+          if (logoField) logoField.classList.add('hidden');
+          if (note) { note.classList.remove('hidden'); note.innerHTML = '💡 <strong>Desktop apps open through their own link protocol.</strong> The app must be installed and support one (e.g. <code>localsend://</code>, <code>openboard://</code>, <code>spotify:</code>, <code>zoommtg:</code>, <code>vscode://</code>, <code>discord:</code>, <code>obsidian:</code>). Clicking the tile will ask your browser to open the app. If nothing happens, the app may not be installed or doesn\u2019t support links.'; }
+        } else {
+          url.placeholder = isAppType ? 'App URL — opens in a new tab, e.g. https://music.youtube.com' : 'https://example.com';
+          if (label) label.textContent = isAppType ? 'App website' : 'Website address';
+          if (logoField) logoField.classList.remove('hidden');
+          if (note) { note.classList.remove('hidden'); note.innerHTML = '💡 <strong>Web apps</strong> (YouTube, Netflix, WhatsApp Web, Spotify Web) open in a new tab — no install needed. Want to open a desktop app instead? Choose \u201cLaunches desktop app\u201d.'; }
+        }
+      }
+      let isAppType = false;
+      function setLinkType(type) {
+        isAppType = type === 'app';
+        $('#link-type-app').classList.toggle('active', isAppType);
+        $('#link-type-web').classList.toggle('active', !isAppType);
+        const picker = $('#link-launch-picker'); if (picker) picker.classList.toggle('hidden', !isAppType);
+        if (!isAppType) { $('#link-launch-browser').classList.add('active'); $('#link-launch-desktop').classList.remove('active'); }
+        setLinkLaunch(isAppType ? linkLaunchMode() : 'browser');
+      }
       function openLinkDialog(link = null) {
         closeEmojiPicker(); $('#emoji-search').value = ''; emojiCategory = 'quick';
         linkEmojiDirty = false;
@@ -2086,6 +2152,8 @@
         $('#link-dialog-heading').textContent = link ? 'Edit quick link' : 'Add a quick link';
         $('#link-dialog .dialog-description').textContent = link ? 'Change its name, destination, icon, or tile colour.' : 'Make this space feel like yours. Links open in a new tab.';
         $('#save-link-button').textContent = link ? 'Save changes' : 'Add link';
+        setLinkType(link && link.type === 'app' ? 'app' : 'web');
+        if (link && link.type === 'app') setLinkLaunch(link.appLaunch === 'desktop' ? 'desktop' : 'browser');
         if (link) {
           $('#link-name').value = link.name;
           $('#link-url').value = link.url;
@@ -2296,14 +2364,26 @@
         catch (error) { console.warn('Could not delete local file', error); showToast('Could not delete that local file.'); }
       });
       $('#save-link-button').addEventListener('click', () => {
-        const name = $('#link-name').value.trim(); const url = safeURL($('#link-url').value); const icon = $('#link-emoji').value.trim(); const color = normaliseHexColour($('#link-color').value);
-        if (!name) { $('#link-name').focus(); return; } if (!url) { $('#link-url').setCustomValidity('Enter a valid http or https address.'); $('#link-url').reportValidity(); $('#link-url').setCustomValidity(''); return; }
+        const name = $('#link-name').value.trim();
+        const rawUrl = $('#link-url').value;
+        const isApp = linkDialogType() === 'app';
+        const url = isApp ? rawUrl.trim() : safeURL(rawUrl);
+        const icon = $('#link-emoji').value.trim(); const color = normaliseHexColour($('#link-color').value);
+        if (!name) { $('#link-name').focus(); return; }
+        if (!url) { $('#link-url').setCustomValidity(isApp ? 'Enter an app link, website, or protocol.' : 'Enter a valid http or https address.'); $('#link-url').reportValidity(); $('#link-url').setCustomValidity(''); return; }
         if (!color) { showToast('Use a six-digit hex tile colour, for example #B9E4D5.'); $('#link-color').focus(); return; }
         const emojiCustom = Boolean(linkEmojiDirty) && icon !== '';
         const logoUrl = $('#link-favicon-url').value.trim();
         const validLogo = safeURL(logoUrl);
-        const favicon = emojiCustom ? null : (validLogo ? validLogo : faviconForUrl(url));
-        const details = { name, url, icon: (Array.from(icon).slice(0,2).join('') || '🔗'), color, iconCustom: emojiCustom, favicon, faviconCustom: Boolean(validLogo) };
+        const launchMode = isApp ? linkLaunchMode() : 'browser';
+        if (isApp && launchMode === 'desktop' && !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url)) {
+          $('#link-url').setCustomValidity('Enter the app\u2019s protocol link, e.g. localsend:// or spotify:');
+          $('#link-url').reportValidity(); $('#link-url').setCustomValidity('');
+          return;
+        }
+        const finalUrl = url;
+        const favicon = emojiCustom ? null : (validLogo ? validLogo : (isApp ? null : faviconForUrl(url)));
+        const details = { name, url: finalUrl, type: isApp ? 'app' : 'web', appLaunch: launchMode, icon: (Array.from(icon).slice(0,2).join('') || '🔗'), color, iconCustom: emojiCustom, favicon, faviconCustom: Boolean(validLogo) };
         if (linkEditingId) {
           const index = activeSpace().links.findIndex(item => item.id === linkEditingId);
           if (index >= 0) activeSpace().links[index] = { ...activeSpace().links[index], ...details };
@@ -2551,6 +2631,10 @@
       });
       document.addEventListener('input', event => { const hue = event.target.closest('[data-colour-hue]'); if (!hue) return; const mixer = hue.closest('[data-colour-mixer]'); if (!mixer) return; setColourFromMixer(mixer.dataset.colourMixer, colourFromMixerHue(mixer), false); });
       document.addEventListener('change', event => { const hue = event.target.closest('[data-colour-hue]'); if (!hue) return; const mixer = hue.closest('[data-colour-mixer]'); if (!mixer) return; setColourFromMixer(mixer.dataset.colourMixer, colourFromMixerHue(mixer), true); });
+      $('#link-type-web').addEventListener('click', () => setLinkType('web'));
+      $('#link-type-app').addEventListener('click', () => setLinkType('app'));
+      $('#link-launch-browser').addEventListener('click', () => setLinkLaunch('browser'));
+      $('#link-launch-desktop').addEventListener('click', () => setLinkLaunch('desktop'));
       $('#link-color').addEventListener('input', renderLinkColourPicker);
       $('#glass-strength').addEventListener('click', () => toggleCustomMenu('#glass-strength', '#glass-menu'));
       $('#glass-menu').addEventListener('click', event => { const choice = event.target.closest('[data-glass-strength]'); if (!choice) return; activeSpace().glass = choice.dataset.glassStrength; saveState(); applyState(); closeCustomMenus(); });
