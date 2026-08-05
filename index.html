@@ -3283,7 +3283,298 @@
       html.mobile-shell .focus-form button { width:36px !important; min-width:36px !important; height:34px !important; min-height:34px !important; }
     }
 
-  </style>
+  
+    /* ─────────────────────────────────────────────────────────────
+       Harbor Home — mobile readability & declutter pass (v3)
+       Mobile-only refinements; the desktop layout is untouched.
+       ───────────────────────────────────────────────────────────── */
+
+    /* Collapse / Expand all controls live in the command deck (mobile only) */
+    .deck-tools { display:none; }
+    html.mobile-shell .deck-tools { display:flex; gap:6px; margin-top:14px; flex-wrap:wrap; }
+    .deck-tool {
+      flex:1; min-height:40px; display:inline-flex; align-items:center; justify-content:center; gap:7px;
+      border:1px solid var(--stroke); border-radius:12px; color:var(--muted); background:rgba(1,10,17,.35);
+      font-size:12.5px; font-weight:800; cursor:pointer;
+    }
+    .deck-tool:active { background:rgba(255,255,255,.10); color:var(--ink); }
+
+    /* Mobile type scale + spacing (bigger, calmer) */
+    @media (max-width: 900px) {
+      .panel { padding:17px 16px; border-radius:18px; }
+      .panel-title { font-size:16px; }
+      .panel-meta, .widget-label { font-size:12px; }
+      .link-name { font-size:13px; font-weight:700; }
+      .link-tile { min-height:84px; gap:9px; }
+      .link-icon { width:40px; height:40px; border-radius:14px; font-size:20px; }
+      .task-copy, .focus-text, .habit-copy, .mistake-main-text, .mistake-context,
+      .syllabus-chapter-title, .syllabus-subject-head strong, .resource-copy strong,
+      .mini-copy strong, .inbox-copy strong, .mock-name, .weather-place { font-size:14px; }
+      .task-meta, .resource-copy span, .mini-copy span, .inbox-copy span,
+      .mock-score-row, .mistake-section-label, .syllabus-summary-copy span { font-size:11.5px; }
+      .note-area { font-size:14.5px; line-height:1.65; padding:14px; }
+      #search-input { font-size:15px; }
+      .task-form input, .task-form select, .focus-form input, .habit-form input,
+      .syllabus-form input, .syllabus-search, .resource-form input, .resource-form select,
+      .mock-form input, .mock-notes-row input, .mistake-form input, .mistake-form select,
+      .mistake-notes textarea, .mistake-submit-row input, .mistake-filter, .mock-search,
+      .weather-location-form input, .command-search, .template-search { font-size:14px; padding:10px 11px; }
+      .field input, .field select { font-size:14px; padding:11px 12px; }
+      .field label { font-size:12px; }
+      .button { min-height:42px; font-size:13px; padding:0 14px; border-radius:12px; }
+      .text-button { font-size:13px; }
+      .icon-button { width:42px; height:42px; }
+      .space-switcher-button { height:42px; border-radius:12px; }
+      .space-switcher-label { font-size:13px; }
+      .task-empty, .habit-empty, .focus-empty, .resource-empty, .syllabus-empty,
+      .mock-empty, .mistake-empty, .inbox-empty { font-size:13px; line-height:1.6; padding:20px 8px; }
+      .glance-copy strong { font-size:14px; } .glance-copy span { font-size:12px; }
+      .widget-toggle strong { font-size:14px; } .widget-toggle span { font-size:12px; }
+      .setting-heading { font-size:13px; }
+      .dialog-title h2 { font-size:19px; } .dialog-description { font-size:12.5px; }
+      .weather-temp { font-size:34px; } .weather-feels { font-size:12px; }
+      .weather-day strong { font-size:11px; } .weather-day small { font-size:10.5px; }
+      .syllabus-status { font-size:11px; min-width:84px; min-height:28px; }
+      .syllabus-summary-copy strong { font-size:13.5px; }
+      .mock-stat strong { font-size:15px; } .mock-stat span { font-size:10.5px; }
+      .mistake-stat strong { font-size:15px; } .mistake-stat span { font-size:10.5px; }
+      .mistake-filter-row button { font-size:12px; min-height:30px; }
+      .timer-display { font-size:48px; }
+      .timer-actions .button { min-height:40px; font-size:13px; }
+      .toast { font-size:13px; }
+      .deck-welcome h1 { font-size:30px; }
+      .hero-copy { font-size:13.5px; }
+      #clock { font-size:54px; }
+      #date { font-size:13px; }
+      /* every widget card spans full width on phones */
+      #widget-board > .panel, #widget-board > .panel.widget-size-compact,
+      #widget-board > .panel.widget-size-wide, #widget-board > .panel.widget-size-full { grid-column:1/-1 !important; }
+    }
+
+    /* Quick links: two big columns on phones (must beat size-specific rules) */
+    @media (max-width: 640px) {
+      #links-widget.widget-size-compact .links-grid,
+      #links-widget.widget-size-wide .links-grid,
+      #links-widget.widget-size-full .links-grid,
+      #links-widget .links-grid, .links-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+      .link-tile { min-height:78px; }
+    }
+    /* "Day at a glance" has no header — never visually collapse it */
+    #widget-board > .panel.at-glance.widget-collapsed > * { display:initial !important; }
+
+    /* Jump bar → horizontal chip strip, sticky under the header */
+    @media (max-width: 900px) {
+      html.mobile-shell .widget-jump-bar { display:flex !important; top:50px !important; }
+      .widget-jump-bar {
+        position:sticky; z-index:15; flex-wrap:nowrap; overflow-x:auto;
+        padding:7px 8px; gap:6px; margin:0 0 12px; border-radius:14px;
+        -webkit-overflow-scrolling:touch; scrollbar-width:none;
+      }
+      .widget-jump-bar::-webkit-scrollbar { display:none; }
+      .widget-jump {
+        width:auto; height:auto; min-height:34px; padding:0 13px; border-radius:99px;
+        display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:800; flex:none;
+      }
+      .widget-jump span { position:static; width:auto; height:auto; overflow:visible; clip:none; white-space:nowrap; }
+      #widget-board > .panel, #widget-board > .panel .panel-header, .links-grid, .command-deck { scroll-margin-top:104px; }
+    }
+
+    /* Accordion widgets on mobile: tap header to collapse, peek stays visible */
+    @media (max-width: 900px) {
+      #widget-board > .panel .panel-header,
+      #widget-board > .panel.calendar-widget .calendar-header { cursor:pointer; user-select:none; -webkit-user-select:none; }
+      #widget-board > .panel .panel-header::after,
+      #widget-board > .panel.calendar-widget .calendar-header::after {
+        content:"▾"; flex:none; margin-left:auto; padding:2px 2px 2px 10px;
+        color:var(--quiet); font-size:13px; font-weight:900;
+        transition:transform .22s ease;
+      }
+      #widget-board > .panel.widget-collapsed .panel-header::after,
+      #widget-board > .panel.calendar-widget.widget-collapsed .calendar-header::after { transform:rotate(-90deg); color:var(--accent); }
+      #widget-board > .panel.widget-collapsed > *:not(.panel-header):not(.calendar-header) { display:none !important; }
+      #widget-board > .panel.calendar-widget.widget-collapsed > .calendar-header ~ * { display:none !important; }
+      #widget-board > .panel.widget-collapsed { min-height:0 !important; }
+    }
+
+    /* Bottom tab bar: 4 tabs, active highlight */
+    html.mobile-shell .mobile-bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    html.mobile-shell .mobile-bottom-nav button.active { color:var(--accent); background:var(--accent-alpha-10); border-color:var(--accent-alpha-45); }
+
+
+    /* ─────────────────────────────────────────────────────────────
+       Text size scale — Small / Medium / Big / Large (all devices).
+       Medium = today's sizes; other tiers scale the main text up/down.
+       ───────────────────────────────────────────────────────────── */
+    .text-size-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 0; color:#dde5e9; font-size:12px; }
+    .text-size-picker { flex:none; }
+    .text-size-picker button { min-width:auto; padding:0 10px; }
+    html[data-fs] { --fs: 1; }
+    html[data-fs="small"] { --fs: .92; }
+    html[data-fs="big"]   { --fs: 1.14; }
+    html[data-fs="large"] { --fs: 1.30; }
+
+    /* Mobile scale — base sizes from the mobile readability pass */
+    @media (max-width: 900px) {
+      html[data-fs] .panel-title { font-size:calc(16px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode .panel-title { font-size:calc(18px * var(--fs, 1)) !important; }
+      html[data-fs] .note-area { font-size:calc(14.5px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode .note-area { font-size:calc(16px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.task-copy, .focus-text, .habit-copy, .link-name, .mistake-main-text,
+        .mistake-context, .syllabus-chapter-title, .syllabus-subject-head strong,
+        .resource-copy strong, .mini-copy strong, .inbox-copy strong, .mock-name,
+        .weather-place, .glance-copy strong, .field input, .field select, .task-form input,
+        .task-form select, .focus-form input, .habit-form input, .syllabus-form input,
+        .syllabus-search, .resource-form input, .resource-form select, .mock-form input,
+        .mock-notes-row input, .mistake-form input, .mistake-form select, .mistake-notes textarea,
+        .mistake-submit-row input, .mistake-filter, .mock-search, .weather-location-form input,
+        .command-search, .template-search, .setup-template-search, .space-switcher-label) {
+        font-size:calc(14px * var(--fs, 1)) !important;
+      }
+      html[data-fs] :is(.hero-copy, #date, .syllabus-summary-copy strong, .toast) { font-size:calc(13.5px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.button, .text-button, .task-empty, .habit-empty, .focus-empty,
+        .resource-empty, .syllabus-empty, .mock-empty, .mistake-empty, .inbox-empty,
+        .weather-location-choice strong, .setup-panel-title) { font-size:calc(13px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.panel-meta, .widget-label, .setting-heading, .field label,
+        .glance-copy span, .widget-toggle strong, .toggle-row > span, .weather-day strong,
+        .mock-score-row, .mistake-section-label, .dialog-description, .privacy-card strong,
+        .syllabus-summary-title, .command-item-copy strong) { font-size:calc(12px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.task-meta, .resource-copy span, .mini-copy span, .inbox-copy span,
+        .weather-feels, .weather-status, .setup-panel-copy, .syllabus-summary-copy span,
+        .mistake-stat span, .mock-stat span, .weather-day small, .widget-toggle span,
+        .mistake-badge, .command-item-copy span, .privacy-card span,
+        .choose-photo-title, .custom-wallpapers-heading) { font-size:calc(11.5px * var(--fs, 1)) !important; }
+      html[data-fs] .theme-segmented button, html[data-fs] .text-size-picker button { font-size:calc(10px * var(--fs, 1)); }
+    }
+
+    /* Desktop scale — base sizes from the desktop layout */
+    @media (min-width: 901px) {
+      html[data-fs] .panel-title { font-size:calc(14px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode .panel-title { font-size:calc(18px * var(--fs, 1)) !important; }
+      html[data-fs] .link-name { font-size:calc(10.5px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode .link-name { font-size:calc(14px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.task-copy, .focus-text, .habit-copy) { font-size:calc(12px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode :is(.task-copy, .focus-text, .habit-copy) { font-size:calc(14px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.panel-meta, .widget-label) { font-size:calc(11px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode :is(.panel-meta, .widget-label) { font-size:calc(12.5px * var(--fs, 1)) !important; }
+      html[data-fs] .note-area { font-size:calc(13px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode .note-area { font-size:calc(16px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.button, .text-button) { font-size:calc(13px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.field input, .field select, .task-form input, .task-form select,
+        .focus-form input, .habit-form input, .syllabus-form input, .syllabus-search,
+        .resource-form input, .resource-form select, .mock-form input, .mock-notes-row input,
+        .mistake-form input, .mistake-form select, .mistake-notes textarea, .mistake-submit-row input,
+        .mistake-filter, .mock-search, .weather-location-form input, .command-search,
+        .template-search, .setup-template-search) { font-size:calc(13px * var(--fs, 1)) !important; }
+      html[data-fs] #search-input { font-size:calc(14px * var(--fs, 1)) !important; }
+      html[data-fs].millennial-mode :is(.field input, .field select, .task-form input, .habit-form input,
+        .weather-location-form input, .command-search, #search-input) { font-size:calc(15px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.task-meta, .resource-copy span, .mini-copy span, .inbox-copy span,
+        .mock-score-row, .weather-feels, .weather-day small, .mistake-section-label) { font-size:calc(10px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.task-empty, .habit-empty, .focus-empty, .resource-empty, .syllabus-empty,
+        .mock-empty, .mistake-empty, .inbox-empty, .weather-status) { font-size:calc(11.5px * var(--fs, 1)) !important; }
+      html[data-fs] :is(.syllabus-chapter-title, .syllabus-subject-head strong, .resource-copy strong,
+        .mini-copy strong, .inbox-copy strong, .mock-name, .weather-place, .glance-copy strong,
+        .space-switcher-label) { font-size:calc(12px * var(--fs, 1)) !important; }
+      html[data-fs] .hero-copy { font-size:calc(12.5px * var(--fs, 1)) !important; }
+      html[data-fs] .theme-segmented button, html[data-fs] .text-size-picker button { font-size:calc(10px * var(--fs, 1)); }
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────
+       Bigger menus: near-fullscreen dialogs on phones, roomier
+       command palette on desktop, 1.8x bottom menus.
+       ───────────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      /* Near-fullscreen for dialogs EXCEPT the More sheet, which stays a compact bottom sheet */
+      dialog:not(#mobile-more-dialog) {
+        width:min(94vw, calc(100% - 20px)) !important;
+        max-width:94vw !important;
+        max-height:92dvh !important;
+      }
+      /* Create Space gets the full near-fullscreen treatment with inner scroll.
+         Robust: no :has() dependency — the whole body scrolls as a fallback, and
+         the template list scrolls internally so big categories (Boards/All = 90+
+         templates) can never clip info or hide the actions. */
+      #space-dialog { width:min(96vw, calc(100% - 16px)) !important; max-width:96vw !important; height:94dvh !important; max-height:94dvh !important; border-radius:26px !important; }
+      #space-dialog .dialog-body { height:94dvh !important; max-height:94dvh !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch; padding-bottom:calc(16px + env(safe-area-inset-bottom)) !important; }
+      #space-dialog #space-template-picker { max-height:44dvh !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch; }
+      .command-list, #global-search-list { max-height:calc(92dvh - 170px) !important; }
+      .inbox-list { max-height:calc(92dvh - 230px) !important; }
+      .widget-toggle-list { max-height:calc(92dvh - 210px) !important; overflow:auto !important; }
+    }
+    @media (min-width: 901px) {
+      #command-dialog, #global-search-dialog {
+        width:min(640px, calc(100vw - 60px)) !important;
+        max-height:86vh !important;
+      }
+      .command-list, #global-search-list { max-height:calc(86vh - 180px) !important; }
+    }
+
+    /* Bottom tab bar — 1.8x touch targets */
+    html.mobile-shell .mobile-bottom-nav { padding:9px; gap:7px; border-radius:26px; }
+    html.mobile-shell .mobile-bottom-nav button { height:83px !important; border-radius:18px; gap:5px; }
+    html.mobile-shell .mobile-bottom-nav button span { font-size:23px !important; }
+    html.mobile-shell .mobile-bottom-nav button small { font-size:12px !important; }
+
+    /* More sheet grid — 1.8x buttons */
+    .mobile-more-grid button { min-height:112px !important; gap:8px; border-radius:18px; }
+    .mobile-more-grid button span { font-size:26px !important; }
+    .mobile-more-grid button small { font-size:12.5px !important; }
+    /* Search engine dropdown — opens upward like the other menus,
+       and fully opaque (the 0.99-alpha + nested backdrop-filter read as
+       transparent inside the glass deck on some devices). */
+    .search-engine-picker .select-menu {
+      top:auto;
+      bottom:calc(100% + 7px);
+      left:0;
+      right:auto;
+      background:rgba(14,23,33,1);
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+    }
+    html.millennial-mode .search-engine-picker .select-menu { background:#ffffff; }
+    html.millennial-mode.millennial-dark .search-engine-picker .select-menu { background:#0d1117; }
+
+
+    /* Auto-fetched site favicons for quick links (fall back to the emoji if unavailable) */
+    .link-icon .link-favicon {
+      width:22px; height:22px; border-radius:5px; object-fit:contain; display:block;
+      background:transparent; flex:none;
+    }
+    .link-icon .link-fallback { display:none; }
+    .link-icon .link-favicon.failed { display:none; }
+    .link-icon .link-favicon.failed + .link-fallback { display:grid; }
+    .link-icon .link-fallback.active { display:grid; }
+    html.millennial-mode .link-icon .link-favicon { border-radius:4px; }
+    /* ─────────────────────────────────────────────────────────────
+       Jump bar chips — icon + name pills on every screen (desktop
+       included). Full-width bar, smart wrapping, uses the space well.
+       ───────────────────────────────────────────────────────────── */
+    @media (min-width: 901px) {
+      .widget-jump-bar {
+        display:flex; flex-wrap:wrap; align-items:center; gap:7px;
+        margin:0 0 16px; padding:7px 8px; position:static;
+      }
+      .widget-jump {
+        width:auto; height:auto; min-height:32px;
+        display:inline-flex; align-items:center; gap:6px;
+        padding:0 12px; border-radius:99px;
+        font-size:12px; font-weight:750;
+        border:1px solid rgba(255,255,255,.11); color:var(--accent);
+        background:rgba(1,10,17,.22); cursor:pointer;
+        transition:transform .16s, background .16s, border-color .16s;
+      }
+      .widget-jump:hover, .widget-jump:focus-visible {
+        transform:translateY(-1px); color:var(--accent-contrast);
+        background:var(--accent); border-color:var(--accent);
+      }
+      .widget-jump span { position:static !important; width:auto !important; height:auto !important; overflow:visible !important; clip:auto !important; clip-path:none !important; white-space:nowrap; }
+      html.millennial-mode .widget-jump { background:#f6f8fa; border-color:#8c959f; color:var(--accent); }
+      html.millennial-mode .widget-jump:hover { background:#eef1f4; color:var(--accent); }
+      html.millennial-mode.millennial-dark .widget-jump { background:#21262d; border-color:#30363d; }
+    }
+
+</style>
 </head>
 <body>
   <div class="background" aria-hidden="true"><img class="background-image" id="background-image" alt="" /></div>
@@ -3334,6 +3625,10 @@
         <input id="search-input" type="search" autocomplete="off" placeholder="Search or enter a website…" aria-label="Search the web or enter a website address" />
         <div class="select-picker search-engine-picker" id="search-engine-picker"><button class="select-trigger" id="search-engine" type="button" aria-haspopup="menu" aria-expanded="false"><span id="search-engine-label">Google</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></button><div class="select-menu hidden" id="search-engine-menu" role="menu"><button type="button" data-search-engine="google">Google</button><button type="button" data-search-engine="duckduckgo">DuckDuckGo</button><button type="button" data-search-engine="youtube">YouTube</button></div></div>
       </form>
+      <div class="deck-tools" id="deck-tools" aria-label="Widget actions">
+        <button type="button" class="deck-tool" id="collapse-widgets">⊟ Collapse all</button>
+        <button type="button" class="deck-tool" id="expand-widgets">⊞ Expand all</button>
+      </div>
       <section class="deck-time" id="clock-widget" aria-label="Local time">
         <div class="time-card-top"><span class="widget-label">Local time</span><span class="live-dot"><i></i>Live</span></div>
         <div id="clock">00:00</div><div id="date">Loading date…</div>
@@ -3425,6 +3720,7 @@
       <p class="dialog-description">Make this space feel like yours. Links open in a new tab.</p>
       <div class="form-row"><div class="field"><label for="link-name">Name</label><input required maxlength="32" id="link-name" placeholder="e.g. Letterboxd" /></div><div class="field emoji-field"><label for="link-emoji">Icon</label><div class="emoji-input-wrap"><input maxlength="4" id="link-emoji" placeholder="🎬" value="🔗" /><button class="emoji-picker-toggle" id="emoji-picker-toggle" type="button" aria-label="Choose an emoji icon" aria-expanded="false">☺</button><div class="emoji-picker-menu hidden" id="emoji-picker-menu"><div class="emoji-picker-top"><input id="emoji-search" type="search" placeholder="Find an emoji…" aria-label="Find an emoji" /></div><div class="emoji-category-tabs" id="emoji-category-tabs"></div><div class="emoji-picker-grid" id="emoji-picker-grid" role="listbox" aria-label="Emoji icons"></div></div></div></div></div>
       <div class="field"><label for="link-url">Website address</label><input required type="text" inputmode="url" id="link-url" placeholder="https://example.com" /></div>
+      <div class="field"><label for="link-favicon-url">Logo URL (optional)</label><input type="url" id="link-favicon-url" placeholder="Auto-detected from the site — set one to override" /></div>
       <div class="field"><label for="link-color">Tile colour</label><div class="link-colour-control"><button class="colour-swatch link-colour-swatch" id="link-color-swatch" type="button" aria-label="Choose tile colour"></button><div class="link-colour-presets" id="link-color-presets" aria-label="Tile colour presets"></div><input id="link-color" type="hidden" value="#b9e4d5" /><div class="colour-menu link-colour-menu hidden" id="link-colour-menu"><span class="colour-menu-title">Custom tile colour</span><div class="colour-mixer" data-colour-mixer="link"><div class="colour-field" data-colour-field tabindex="0" role="slider" aria-label="Choose tile colour shade" aria-valuemin="0" aria-valuemax="100"><span class="colour-field-thumb" data-colour-thumb></span></div><input class="colour-hue" data-colour-hue type="range" min="0" max="360" value="160" aria-label="Choose tile colour hue" /></div></div></div></div>
       <div class="dialog-actions"><button class="button quiet" data-close-dialog="link-dialog" type="button">Cancel</button><button class="button primary" id="save-link-button" value="default" type="button">Add link</button></div>
     </form>
@@ -3450,6 +3746,7 @@
       <section class="setting-section">
         <span class="setting-heading">Appearance</span>
         <div class="form-row"><div class="field"><label for="accent-color">Accent colour</label><div class="accent-picker"><button id="accent-color" class="colour-swatch accent-swatch" type="button" aria-label="Choose accent colour" aria-expanded="false"></button><div class="colour-menu hidden" id="accent-colour-menu"><span class="colour-menu-title">Choose an accent</span><div class="colour-presets" id="accent-colour-presets"></div><input id="accent-hex" type="hidden" value="#91DEC5" /><div class="colour-mixer" data-colour-mixer="accent"><span class="colour-mixer-title">Custom colour</span><div class="colour-field" data-colour-field tabindex="0" role="slider" aria-label="Choose accent colour shade" aria-valuemin="0" aria-valuemax="100"><span class="colour-field-thumb" data-colour-thumb></span></div><input class="colour-hue" data-colour-hue type="range" min="0" max="360" value="160" aria-label="Choose accent colour hue" /></div></div></div></div><div class="field"><label for="glass-strength">Glass opacity</label><div class="select-picker" id="glass-picker"><button class="select-trigger field-select-trigger" id="glass-strength" type="button" aria-haspopup="menu" aria-expanded="false"><span id="glass-strength-label">Dark</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></button><div class="select-menu hidden" id="glass-menu" role="menu"><button type="button" data-glass-strength="light">Light</button><button type="button" data-glass-strength="balanced">Balanced</button><button type="button" data-glass-strength="dark">Dark</button></div></div></div></div>
+        <div class="text-size-row"><span>Text size</span><div class="theme-segmented text-size-picker" id="text-size-picker" role="group" aria-label="Text size"><button type="button" data-text-size="small">Small</button><button type="button" data-text-size="medium">Medium</button><button type="button" data-text-size="big">Big</button><button type="button" data-text-size="large">Large</button></div></div>
         <div class="toggle-row"><span>Use 24-hour time</span><label class="switch"><input type="checkbox" id="hour-format" /><span class="hidden">Use 24-hour time</span></label></div>
         <div class="toggle-row"><span>Show seconds</span><label class="switch"><input type="checkbox" id="show-seconds" /><span class="hidden">Show seconds</span></label></div>
         <div class="toggle-row"><span><strong class="millennial-label">Millennial mode</strong><small>Plain, compact interface with no glass or wallpaper.</small></span><label class="switch"><input type="checkbox" id="millennial-mode" /><span class="hidden">Use Millennial mode</span></label></div>
@@ -3586,9 +3883,8 @@
   </dialog>
 
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Mobile navigation">
-    <button type="button" data-mobile-action="capture" aria-label="Quick capture"><span>＋</span><small>Add</small></button>
+    <button type="button" data-mobile-action="home" class="active" aria-label="Home"><span>⌂</span><small>Home</small></button>
     <button type="button" data-mobile-action="search" aria-label="Search everything"><span>⌕</span><small>Search</small></button>
-    <button type="button" data-mobile-action="widgets" aria-label="Layout and widgets"><span>▦</span><small>Layout</small></button>
     <button type="button" data-mobile-action="settings" aria-label="Settings"><span>⚙</span><small>Settings</small></button>
     <button type="button" data-mobile-action="more" aria-label="More actions"><span>☰</span><small>More</small></button>
   </nav>
@@ -4168,7 +4464,7 @@
           version: 15,
           profileName: '',
           activeSpaceId: 'study',
-          global: { searchEngine: 'google', is24Hour: false, showSeconds: false, millennialMode: false, millennialTheme: 'light', customWallpapers: [], customColours: [], inbox: [], onboardingComplete: false, googleBackup: { auto: false, lastBackupAt: 0, lastRestoreAt: 0 } },
+          global: { searchEngine: 'google', is24Hour: false, showSeconds: false, fontScale: 'medium', millennialMode: false, millennialTheme: 'light', customWallpapers: [], customColours: [], inbox: [], onboardingComplete: false, googleBackup: { auto: false, lastBackupAt: 0, lastRestoreAt: 0 } },
           spaces
         };
       }
@@ -4224,6 +4520,7 @@
             is24Hour: Boolean(global.is24Hour),
             showSeconds: Boolean(global.showSeconds),
             millennialMode: Boolean(global.millennialMode),
+            fontScale: ['small','medium','big','large'].includes(global.fontScale) ? global.fontScale : 'medium',
             millennialTheme: global.millennialTheme === 'dark' ? 'dark' : 'light',
             inbox: Array.isArray(global.inbox) ? global.inbox : [],
             customWallpapers,
@@ -4763,6 +5060,10 @@
         updateResponsiveShellClass();
         const space = activeSpace(); const millennialMode = Boolean(state.global.millennialMode); const millennialTheme = state.global.millennialTheme === 'dark' ? 'dark' : 'light';
         const millennialLight = millennialMode && millennialTheme === 'light';
+        const fontScale = ['small','medium','big','large'].includes(state.global.fontScale) ? state.global.fontScale : 'medium';
+        document.documentElement.dataset.fs = fontScale;
+        document.querySelectorAll('[data-text-size]').forEach(button => button.classList.toggle('active', button.dataset.textSize === fontScale));
+        const fsMultiplier = { small:0.92, medium:1, big:1.14, large:1.30 }[fontScale] || 1;
         document.documentElement.classList.toggle('millennial-mode', millennialMode);
         document.documentElement.classList.toggle('millennial-dark', millennialMode && millennialTheme === 'dark');
         document.body.classList.toggle('millennial-mode', millennialMode);
@@ -4771,7 +5072,7 @@
           if (millennialLight) {
             control.style.setProperty('color', '#0d1117', 'important');
             control.style.setProperty('-webkit-text-fill-color', '#0d1117', 'important');
-            control.style.setProperty('font-size', '15px', 'important');
+            control.style.setProperty('font-size', `calc(15px * ${fsMultiplier})`, 'important');
             control.style.setProperty('font-weight', '700', 'important');
             control.style.setProperty('opacity', '1', 'important');
           } else {
@@ -4910,11 +5211,45 @@
         customSection.classList.toggle('hidden', customWallpapers.length === 0);
         $('#custom-background-options').innerHTML = customWallpapers.map(wallpaper => tile({ id: wallpaper.id, name: wallpaper.name, data: wallpaper.data, active: space.wallpaperId === `user:${wallpaper.id}`, custom: true })).join('');
       }
+      function faviconForUrl(url) {
+        try {
+          const parsed = new URL(String(url || ''));
+          if (!['http:', 'https:'].includes(parsed.protocol)) return null;
+          return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(parsed.hostname)}&sz=64`;
+        } catch (error) { return null; }
+      }
+      function isYouTubeChannelUrl(url) {
+        return /youtube\.com\/(@|channel\/|c\/|user\/)/i.test(String(url || ''));
+      }
+      function linkIconMarkup(link) {
+        const fallback = escapeHTML(link.icon || '🔗');
+        const favicon = (!link.iconCustom) ? (link.favicon || faviconForUrl(link.url)) : null;
+        if (favicon) return `<img class="link-favicon" src="${escapeHTML(favicon)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.classList.add('failed')" /><span class="link-fallback">${fallback}</span>`;
+        return `<span class="link-fallback active">${fallback}</span>`;
+      }
+      async function upgradeYouTubeAvatars(links) {
+        const targets = (links || []).filter(link => !link.iconCustom && isYouTubeChannelUrl(link.url) && !link.faviconTried && !link.faviconAvatar);
+        if (!targets.length) return;
+        targets.forEach(link => { link.faviconTried = true; });
+        const results = await Promise.all(targets.map(async link => {
+          try {
+            const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(link.url)}&format=json`);
+            if (!response.ok) return null;
+            const payload = await response.json();
+            return payload?.thumbnail_url || null;
+          } catch (error) { return null; }
+        }));
+        let changed = false;
+        targets.forEach((link, index) => {
+          if (results[index]) { link.favicon = results[index]; link.faviconAvatar = true; changed = true; }
+        });
+        if (changed) { saveState(); renderLinks(); }
+      }
       function renderLinks() {
         const grid = $('#links-grid');
         const linkTiles = activeSpace().links.map(link => `
           <div class="link-tile" draggable="${editing}" data-link-id="${escapeHTML(link.id)}" data-link-url="${escapeHTML(link.url)}" role="link" tabindex="0" title="Open ${escapeHTML(link.name)}">
-            <span class="link-icon" style="--link-color:${escapeHTML(link.color || '#b9e4d5')}">${escapeHTML(link.icon || '🔗')}</span>
+            <span class="link-icon" style="--link-color:${escapeHTML(link.color || '#b9e4d5')}">${linkIconMarkup(link)}</span>
             <span class="link-name">${escapeHTML(link.name)}</span>
             <button class="link-edit" type="button" data-edit-link="${escapeHTML(link.id)}" aria-label="Edit ${escapeHTML(link.name)}">✎</button>
             <button class="link-delete" type="button" data-delete-link="${escapeHTML(link.id)}" aria-label="Remove ${escapeHTML(link.name)}">×</button>
@@ -4922,6 +5257,7 @@
         grid.innerHTML = linkTiles + `<button type="button" class="link-tile link-add" id="link-add-tile"><span class="link-icon">+</span><span class="link-name">Add link</span></button>`;
         grid.closest('.panel').classList.toggle('editing', editing);
         wireLinkInteractions();
+        upgradeYouTubeAvatars(activeSpace().links);
       }
 
       let resourceFilter = 'all';
@@ -5637,8 +5973,10 @@
           });
         });
       }
+      let linkEmojiDirty = false;
       function openLinkDialog(link = null) {
         closeEmojiPicker(); $('#emoji-search').value = ''; emojiCategory = 'quick';
+        linkEmojiDirty = false;
         linkEditingId = link ? link.id : null;
         const form = $('#link-form');
         form.reset();
@@ -5650,9 +5988,11 @@
           $('#link-url').value = link.url;
           $('#link-emoji').value = link.icon || '🔗';
           $('#link-color').value = link.color || '#b9e4d5';
+          $('#link-favicon-url').value = link.faviconCustom ? (link.favicon || '') : '';
         } else {
           $('#link-emoji').value = '🔗';
           $('#link-color').value = '#b9e4d5';
+          $('#link-favicon-url').value = '';
         }
         renderLinkColourPicker();
         $('#link-dialog').showModal(); setTimeout(() => $('#link-name').focus(), 50);
@@ -5844,10 +6184,14 @@
         catch (error) { console.warn('Could not delete local file', error); showToast('Could not delete that local file.'); }
       });
       $('#save-link-button').addEventListener('click', () => {
-        const name = $('#link-name').value.trim(); const url = safeURL($('#link-url').value); const icon = $('#link-emoji').value.trim() || '🔗'; const color = normaliseHexColour($('#link-color').value);
+        const name = $('#link-name').value.trim(); const url = safeURL($('#link-url').value); const icon = $('#link-emoji').value.trim(); const color = normaliseHexColour($('#link-color').value);
         if (!name) { $('#link-name').focus(); return; } if (!url) { $('#link-url').setCustomValidity('Enter a valid http or https address.'); $('#link-url').reportValidity(); $('#link-url').setCustomValidity(''); return; }
         if (!color) { showToast('Use a six-digit hex tile colour, for example #B9E4D5.'); $('#link-color').focus(); return; }
-        const details = { name, url, icon: Array.from(icon).slice(0,2).join(''), color };
+        const emojiCustom = Boolean(linkEmojiDirty) && icon !== '';
+        const logoUrl = $('#link-favicon-url').value.trim();
+        const validLogo = safeURL(logoUrl);
+        const favicon = emojiCustom ? null : (validLogo ? validLogo : faviconForUrl(url));
+        const details = { name, url, icon: (Array.from(icon).slice(0,2).join('') || '🔗'), color, iconCustom: emojiCustom, favicon, faviconCustom: Boolean(validLogo) };
         if (linkEditingId) {
           const index = activeSpace().links.findIndex(item => item.id === linkEditingId);
           if (index >= 0) activeSpace().links[index] = { ...activeSpace().links[index], ...details };
@@ -5913,6 +6257,9 @@
           settings: () => $('#settings-dialog').showModal(),
           backup: () => cloudBackupNow(false),
           setup: () => { state.global.onboardingComplete = true; setOnboardingMode('simple'); renderOnboardingTemplates(); $('#onboarding-dialog').showModal(); },
+          home: () => window.scrollTo({ top:0, behavior:'smooth' }),
+          study: () => mobileJumpWidget('syllabus'),
+          tasks: () => mobileJumpWidget('tasks'),
           top: () => window.scrollTo({ top:0, behavior:'smooth' }),
           more: () => $('#mobile-more-dialog').showModal()
         };
@@ -6041,7 +6388,8 @@
       $('#emoji-picker-toggle').addEventListener('click', toggleEmojiPicker);
       $('#emoji-category-tabs').addEventListener('click', event => { const button = event.target.closest('[data-emoji-category]'); if (!button) return; emojiCategory = button.dataset.emojiCategory; renderEmojiPicker($('#emoji-search').value || ''); });
       $('#emoji-search').addEventListener('input', event => renderEmojiPicker(event.target.value));
-      $('#emoji-picker-grid').addEventListener('click', event => { const button = event.target.closest('[data-emoji-value]'); if (!button) return; $('#link-emoji').value = button.dataset.emojiValue; closeEmojiPicker(); $('#link-emoji').focus(); });
+      $('#emoji-picker-grid').addEventListener('click', event => { const button = event.target.closest('[data-emoji-value]'); if (!button) return; $('#link-emoji').value = button.dataset.emojiValue; linkEmojiDirty = true; closeEmojiPicker(); $('#link-emoji').focus(); });
+      $('#link-emoji').addEventListener('input', () => { linkEmojiDirty = true; });
       $('#link-color-swatch').addEventListener('click', () => { const menu = $('#link-colour-menu'); const opening = menu.classList.contains('hidden'); menu.classList.toggle('hidden', !opening); $('#link-color-swatch').setAttribute('aria-expanded', String(opening)); if (opening) document.querySelector('[data-colour-mixer="link"] [data-colour-field]')?.focus(); });
       $('#link-color-presets').addEventListener('click', event => {
         const remove = event.target.closest('[data-delete-colour]');
@@ -6054,6 +6402,10 @@
       $('#link-color').addEventListener('input', renderLinkColourPicker);
       $('#glass-strength').addEventListener('click', () => toggleCustomMenu('#glass-strength', '#glass-menu'));
       $('#glass-menu').addEventListener('click', event => { const choice = event.target.closest('[data-glass-strength]'); if (!choice) return; activeSpace().glass = choice.dataset.glassStrength; saveState(); applyState(); closeCustomMenus(); });
+      $('#text-size-picker')?.addEventListener('click', event => {
+        const choice = event.target.closest('[data-text-size]'); if (!choice) return;
+        state.global.fontScale = choice.dataset.textSize; saveState(); applyState();
+      });
       $('#hour-format').addEventListener('change', event => { state.global.is24Hour = event.target.checked; saveState(); updateClock(); });
       $('#show-seconds').addEventListener('change', event => { state.global.showSeconds = event.target.checked; saveState(); updateClock(); });
       $('#millennial-mode').addEventListener('change', event => { state.global.millennialMode = event.target.checked; saveState(); applyState(); });
@@ -6093,7 +6445,61 @@
       $('#daily-quote').textContent = quotes[Math.floor(Date.now() / 86400000) % quotes.length];
       $('#task-date').value = localISODate(); setTaskPriority('normal');
       initTemplatePicker(); applyState(); initFirebaseBackup().catch(() => {}); maybeShowOnboarding(); setInterval(updateClock, 1000); setInterval(tickTimer, 1000);
+
+      /* ── Mobile v3: accordion widgets, tab bar, deck tools (desktop no-op) ── */
+      let widgetCollapsed = {};
+      try { widgetCollapsed = JSON.parse(localStorage.getItem('hh_widget_collapsed') || '{}'); } catch (error) {}
+      function collapsibleWidgets() {
+        return [...document.querySelectorAll('#widget-board > .panel[data-widget]')].filter(card =>
+          card.dataset.widget !== 'daily' && (card.querySelector('.panel-header') || card.querySelector('.calendar-header')));
+      }
+      function persistWidgetCollapse() {
+        try { localStorage.setItem('hh_widget_collapsed', JSON.stringify(widgetCollapsed)); } catch (error) {}
+      }
+      function applyWidgetCollapse() {
+        collapsibleWidgets().forEach(card => {
+          card.classList.toggle('widget-collapsed', Boolean(widgetCollapsed[card.dataset.widget]));
+        });
+      }
+      function toggleWidgetCard(card) {
+        const widget = card.dataset.widget;
+        if (card.classList.contains('widget-collapsed')) delete widgetCollapsed[widget]; else widgetCollapsed[widget] = true;
+        persistWidgetCollapse(); applyWidgetCollapse();
+      }
+      document.addEventListener('click', event => {
+        if (!document.documentElement.classList.contains('mobile-shell')) return;
+        if (event.target.closest('button, a, input, select, label, textarea, .calendar-nav')) return;
+        const header = event.target.closest('#widget-board .panel-header, #widget-board .calendar-widget .calendar-header');
+        if (!header) return;
+        const card = header.closest('#widget-board > .panel');
+        if (card) toggleWidgetCard(card);
+      });
+      $('#collapse-widgets')?.addEventListener('click', () => {
+        collapsibleWidgets().forEach(card => { widgetCollapsed[card.dataset.widget] = true; });
+        persistWidgetCollapse(); applyWidgetCollapse();
+      });
+      $('#expand-widgets')?.addEventListener('click', () => { widgetCollapsed = {}; persistWidgetCollapse(); applyWidgetCollapse(); });
+      function mobileJumpWidget(id) {
+        if (document.documentElement.classList.contains('mobile-shell')) { delete widgetCollapsed[id]; persistWidgetCollapse(); applyWidgetCollapse(); }
+        revealWidget(id); jumpToWidget(id);
+      }
+      const __jumpToWidget = jumpToWidget;
+      jumpToWidget = function (id) {
+        if (document.documentElement.classList.contains('mobile-shell')) { delete widgetCollapsed[id]; persistWidgetCollapse(); applyWidgetCollapse(); }
+        return __jumpToWidget(id);
+      };
+      $('#mobile-bottom-nav')?.addEventListener('click', event => {
+        const button = event.target.closest('[data-mobile-action]');
+        if (!button) return;
+        document.querySelectorAll('#mobile-bottom-nav button').forEach(btn => btn.classList.toggle('active', btn === button));
+      });
+      const bgImage = $('#background-image');
+      if (bgImage) {
+        if (bgImage.complete && bgImage.naturalWidth === 0) bgImage.style.display = 'none';
+        bgImage.addEventListener('error', () => { bgImage.style.display = 'none'; }, { once: true });
+      }
+      applyWidgetCollapse();
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2616af71f1a162a',t:'MTc4NTg4NjkzOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2616af71f1a162a',t:'MTc4NTg4NjkzOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26784a18ede91e8',t:'MTc4NTk1MDkwNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
