@@ -1,14 +1,20 @@
 /* Harbor Home service worker — offline app shell.
    Strategy: cache-first for the shell, network-first for navigation
    (so updates reach users), network-only for third-party APIs. */
-const VERSION = 'harbor-home-v1';
+const VERSION = 'harbor-home-v2';
 const PRECACHE = [
   './',
   './index.html',
+  './styles.css',
+  './app.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/icon-maskable-512.png'
+  './icons/icon-maskable-512.png',
+  './assets/wallpapers/wp-aurora.jpg',
+  './assets/wallpapers/wp-city.jpg',
+  './assets/wallpapers/wp-desert.jpg',
+  './assets/wallpapers/wp-forest.jpg'
 ];
 
 self.addEventListener('install', (event) => {
