@@ -3637,3 +3637,19 @@
     -webkit-backdrop-filter: none !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile top cleanup — kill the visible "box" around the space
+   selector: no border, no inner highlight, flat subtle pill.
+   Also drop the 1px shadow line under the topbar.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  html.mobile-shell .space-switcher-button {
+    border: 1px solid transparent !important;
+    background: rgba(255, 255, 255, .045) !important;
+    box-shadow: none !important;
+  }
+  html.mobile-shell .topbar {
+    box-shadow: none !important;
+  }
+}
