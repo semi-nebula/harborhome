@@ -113,81 +113,7 @@
         const preset = SPACE_LAYOUT_PRESETS[space.preset] ? space.preset : 'default'; const layout = SPACE_LAYOUT_PRESETS[preset];
         space.enabledWidgets = [...layout.enabled]; space.widgetOrder = normaliseWidgetOrder(layout.order); space.widgetSizes = normaliseWidgetSizes(layout.sizes, preset); space.visualVersion = 2;
       }
-      function createBoardExamTemplates() {
-        const search = query => `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        const boardConfigs = [
-          ['cbse', 'CBSE', 'CB', 'https://www.cbse.gov.in/'],
-          ['icse', 'ICSE', 'IC', 'https://cisce.org/'],
-          ['isc', 'ISC', 'ISC', 'https://cisce.org/'],
-          ['maharashtra-board', 'Maharashtra Board', 'MH', 'https://www.mahahsscboard.in/'],
-          ['karnataka-board', 'Karnataka Board', 'KA', search('Karnataka SSLC PUC board official website')],
-          ['west-bengal-board', 'West Bengal Board', 'WB', search('West Bengal board official website class 10 12')],
-          ['tamil-nadu-board', 'Tamil Nadu Board', 'TN', search('Tamil Nadu board official website class 10 12')],
-          ['kerala-board', 'Kerala Board', 'KE', search('Kerala SSLC DHSE board official website')],
-          ['gujarat-board', 'Gujarat Board', 'GJ', search('GSEB Gujarat board official website')],
-          ['rajasthan-board', 'Rajasthan Board', 'RJ', search('RBSE Rajasthan board official website')],
-          ['up-board', 'UP Board', 'UP', search('UP Board official website class 10 12')],
-          ['bihar-board', 'Bihar Board', 'BR', search('BSEB Bihar board official website')],
-          ['mp-board', 'MP Board', 'MP', search('MPBSE Madhya Pradesh board official website')],
-          ['telangana-board', 'Telangana Board', 'TS', search('Telangana SSC intermediate board official website')],
-          ['andhra-board', 'Andhra Pradesh Board', 'AP', search('Andhra Pradesh SSC intermediate board official website')],
-          ['odisha-board', 'Odisha Board', 'OD', search('Odisha board BSE CHSE official website')],
-          ['assam-board', 'Assam Board', 'AS', search('Assam SEBA AHSEC board official website')],
-          ['punjab-board', 'Punjab Board', 'PB', search('PSEB Punjab board official website')],
-          ['haryana-board', 'Haryana Board', 'HR', search('HBSE Haryana board official website')],
-          ['jharkhand-board', 'Jharkhand Board', 'JH', search('JAC Jharkhand board official website')],
-          ['chhattisgarh-board', 'Chhattisgarh Board', 'CG', search('CGBSE Chhattisgarh board official website')],
-          ['himachal-board', 'Himachal Board', 'HP', search('HPBOSE Himachal board official website')],
-          ['uttarakhand-board', 'Uttarakhand Board', 'UK', search('Uttarakhand board official website')],
-          ['jk-board', 'J&K Board', 'JK', search('JKBOSE official website')],
-          ['goa-board', 'Goa Board', 'GA', search('Goa board official website')],
-          ['manipur-board', 'Manipur Board', 'MN', search('Manipur board COHSEM BOSEM official website')],
-          ['meghalaya-board', 'Meghalaya Board', 'ML', search('Meghalaya board MBOSE official website')],
-          ['mizoram-board', 'Mizoram Board', 'MZ', search('Mizoram board MBSE official website')],
-          ['nagaland-board', 'Nagaland Board', 'NL', search('Nagaland board NBSE official website')],
-          ['tripura-board', 'Tripura Board', 'TR', search('Tripura board TBSE official website')]
-        ];
-        const output = {};
-        const classDetails = {
-          '10': { label:'10th', subjects:['Maths','Science','Social Science','English','Language'], notes:'Subjects:\n- Maths:\n- Science:\n- Social Science:\n- English:\n- Language:\n\nImportant chapters:\n- \n\nWriting/presentation notes:\n- ' },
-          '12': { label:'12th', subjects:['English','Stream subjects','Practical/project work','Sample papers'], notes:'Stream:\n- Science / Commerce / Arts\n\nSubjects:\n- \n\nPractical/project work:\n- \n\nImportant chapters:\n- \n\nSample paper analysis:\n- ' }
-        };
-        boardConfigs.forEach(([slug, boardName, icon, officialUrl]) => {
-          Object.entries(classDetails).forEach(([grade, detail]) => {
-            const key = `${slug}-${grade}`;
-            const title = `${boardName} ${detail.label}`;
-            output[key] = {
-              name: `${title} Prep`, icon, accent: grade === '10' ? '#91dec5' : '#83bdf0', wallpaperId:'forest', glass:'balanced',
-              links:[
-                { id:`${key}-official`, name: boardName.slice(0, 18), url: officialUrl, icon, color: grade === '10' ? '#91dec5' : '#83bdf0' },
-                { id:`${key}-syllabus`, name:'Syllabus', url: search(`${title} official syllabus`), icon:'📄', color:'#f2c697' },
-                { id:`${key}-papers`, name:'Sample Papers', url: search(`${title} sample papers previous year papers official`), icon:'⧉', color:'#d6dd8d' },
-                { id:`${key}-lectures`, name:'Lectures', url: search(`${title} preparation lectures`), icon:'▶', color:'#f1a5a5' }
-              ],
-              resources:[[`${boardName} official website`, officialUrl, 'General'],[`${title} syllabus search`, search(`${title} official syllabus`), 'General'],[`${title} sample/PYQ search`, search(`${title} sample papers previous year papers official`), 'PYQs'],[`${title} lectures search`, search(`${title} preparation lectures`), 'General']],
-              tasks:[`Confirm ${title} syllabus and exam pattern`,'List all subjects and chapter status','Revise one high-priority chapter','Solve one sample/PYQ paper section','Update mistake and presentation notes'],
-              focus:['Finish one board chapter revision','Practice answer presentation','Review yesterday’s mistakes'],
-              habits:['Daily chapter revision','Writing practice','Formula/definition revision','Sample paper practice'],
-              notes:`${title}\n\nBoard/Class details:\n- ${title}\n\n${detail.notes}`
-            };
-          });
-        });
-        output['state-board-10'] = {
-          name:'State Board 10th Prep', icon:'10', accent:'#91dec5', wallpaperId:'forest', glass:'balanced',
-          links:[{id:'state-board-search', name:'Board Search', url: search('Indian state board official website class 10'), icon:'⌕', color:'#91dec5'},{id:'state-board-syllabus', name:'Syllabus', url: search('state board class 10 official syllabus'), icon:'📄', color:'#f2c697'},{id:'state-board-pyq', name:'Papers', url: search('state board class 10 previous year papers'), icon:'⧉', color:'#d6dd8d'}],
-          resources:[['Find your state board official website', search('Indian state board official website class 10'), 'General'],['Class 10 syllabus search', search('state board class 10 official syllabus'), 'General'],['Class 10 sample/PYQ search', search('state board class 10 previous year papers'), 'PYQs']],
-          tasks:['Choose your state board and subjects','Download/check official syllabus','Revise one chapter','Practice one written answer set','Review sample paper mistakes'], focus:['Finish one class 10 chapter','Practice answer writing','Update subject checklist'], habits:['Chapter revision','Writing practice','Formula/definition revision','Sample papers'], notes:'State Board 10th\n\nState/board:\n- \n\nSubjects:\n- \n\nImportant chapters:\n- '
-        };
-        output['state-board-12'] = {
-          name:'State Board 12th Prep', icon:'12', accent:'#83bdf0', wallpaperId:'harbor', glass:'balanced',
-          links:[{id:'state-board-12-search', name:'Board Search', url: search('Indian state board official website class 12'), icon:'⌕', color:'#83bdf0'},{id:'state-board-12-syllabus', name:'Syllabus', url: search('state board class 12 official syllabus'), icon:'📄', color:'#f2c697'},{id:'state-board-12-pyq', name:'Papers', url: search('state board class 12 previous year papers'), icon:'⧉', color:'#d6dd8d'}],
-          resources:[['Find your state board official website', search('Indian state board official website class 12'), 'General'],['Class 12 syllabus search', search('state board class 12 official syllabus'), 'General'],['Class 12 sample/PYQ search', search('state board class 12 previous year papers'), 'PYQs']],
-          tasks:['Choose your state board, stream, and subjects','Download/check official syllabus','Revise one high-weightage chapter','Practice one sample-paper section','Review practical/project requirements'], focus:['Finish one class 12 topic','Practice board-style answers','Update stream subject checklist'], habits:['Subject revision','Writing practice','Formula/definition revision','Sample papers'], notes:'State Board 12th\n\nState/board:\n- \n\nStream:\n- Science / Commerce / Arts\n\nSubjects:\n- \n\nPractical/project work:\n- '
-        };
-        return output;
-      }
-
-      const EXAM_TEMPLATES = {
+const EXAM_TEMPLATES = {
         neet: {
           name:'NEET Prep', icon:'⚕', accent:'#a8e5b8', wallpaperId:'forest', glass:'dark',
           links:[
@@ -387,8 +313,58 @@
       };
       Object.assign(EXAM_TEMPLATES, createBoardExamTemplates());
 
+                  function createBoardExamTemplates() {
+        const search = query => `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        const boards = typeof BOARD_INFO !== 'undefined' ? BOARD_INFO : {};
+        const chapters = typeof BOARD_CHAPTERS !== 'undefined' ? BOARD_CHAPTERS : {};
+        const boardSlugs = Object.keys(boards).length ? Object.keys(boards) : ['cbse','icse','isc'];
+        const output = {};
+        boardSlugs.forEach(slug => {
+          const info = boards[slug] || { name: slug, icon: slug.slice(0,2).toUpperCase(), url10: search(slug + ' board official'), url12: search(slug + ' board official') };
+          const boardName = info.name;
+          const icon = info.icon;
+          [['10', info.url10], ['12', info.url12]].forEach(([grade, officialUrl]) => {
+            const key = `${slug}-${grade}`;
+            const title = `${boardName} ${grade}th`;
+            const gradeKey = grade === '10' ? '10' : '12';
+            const subjectDefs = grade === '10'
+              ? [['Maths', chapters['10-maths'] || []], ['Science', chapters['10-science'] || []], ['Social Science', chapters['10-social'] || []], ['English', chapters['10-english'] || []]]
+              : [['Physics', chapters['12-physics'] || []], ['Chemistry', chapters['12-chemistry'] || []], ['Maths', chapters['12-maths'] || []], ['Biology', chapters['12-biology'] || []], ['English', chapters['12-english'] || []]];
+            const syllabus = subjectDefs.filter(([, ch]) => ch.length).map(([name, ch]) => ({ id: uniqueId('subject'), name, chapters: ch.map(t => ({ id: uniqueId('chapter'), title: t, status: 'not-started' })) }));
+            output[key] = {
+              name: `${boardName} ${grade}th Prep`, icon, accent: grade === '10' ? '#91dec5' : '#83bdf0', wallpaperId: 'forest', glass: 'balanced',
+              links: [
+                { id: `${key}-official`, name: boardName.slice(0, 18), url: officialUrl || search(`${boardName} ${grade}th official website`), icon, color: grade === '10' ? '#91dec5' : '#83bdf0' },
+                { id: `${key}-syllabus`, name: 'Syllabus', url: search(`${title} official syllabus`), icon: '📄', color: '#f2c697' },
+                { id: `${key}-papers`, name: 'Sample Papers', url: search(`${title} sample papers previous year papers official`), icon: '⧉', color: '#d6dd8d' },
+                { id: `${key}-lectures`, name: 'Lectures', url: search(`${title} preparation lectures`), icon: '▶', color: '#f1a5a5' }
+              ],
+              resources: [
+                [`${boardName} official website`, officialUrl || search(`${boardName} ${grade}th official website`), 'General'],
+                [`${title} syllabus search`, search(`${title} official syllabus`), 'General'],
+                [`${title} sample/PYQ search`, search(`${title} sample papers previous year papers official`), 'PYQs'],
+                [`${title} lectures search`, search(`${title} preparation lectures`), 'General']
+              ],
+              syllabus,
+              tasks: [`Confirm ${title} syllabus and exam pattern`, 'List all subjects and chapter status', 'Revise one high-priority chapter', 'Solve one sample/PYQ paper', 'Review mistakes in the mistake log'],
+              focus: [`Master one ${grade === '10' ? 'Science' : 'Physics/Chemistry'} chapter`, 'Practice one PYQ set'],
+              habits: ['Subject revision', 'PYQ practice', 'Mistake review'],
+              notes: `${boardName} ${grade}th Dashboard\n\nSubjects and chapter status:\n- \n\nImportant chapters:\n- \n\nSample paper analysis:\n- \n\nMistake log:\n- `
+            };
+          });
+        });
+        return output;
+      }
       function templateLinks(template) {
-        if (EXAM_TEMPLATES[template]?.links) return clone(EXAM_TEMPLATES[template].links);
+        if (typeof EXAM_DATA !== 'undefined' && EXAM_DATA[template]) {
+          const link = (id, name, url, icon, color) => ({ id, name, url, icon, color });
+          const out = [];
+          const d = EXAM_DATA[template];
+          if (d.official) out.push(link(`${template}-official`, d.official.label, d.official.url, '🏛', '#f2c697'));
+          (d.channels || []).forEach((c, i) => out.push(link(`${template}-yt-${i}`, c.name, c.url, '▶', '#f1a5a5')));
+          if (out.length) return out;
+        }
+if (EXAM_TEMPLATES[template]?.links) return clone(EXAM_TEMPLATES[template].links);
         const link = (id, name, url, icon, color) => ({ id, name, url, icon, color });
         const templates = {
           study: [link('drive', 'Drive', 'https://drive.google.com/', '△', '#a8cbf0'), link('notion', 'Notion', 'https://www.notion.so/', 'N', '#e1e4e6'), link('youtube', 'YouTube', 'https://www.youtube.com/', '▶', '#f1a5a5'), link('gmail', 'Gmail', 'https://mail.google.com/', '✉', '#f2c697')],
@@ -411,11 +387,20 @@
         };
         return clone(templates[template] || []);
       }
-      function templateDate(daysFromToday = 0) {
+            function templateDate(daysFromToday = 0) {
         return localISODate(new Date(Date.now() + daysFromToday * 86400000));
       }
       function templateResources(template) {
         const resource = (id, title, url, subject = 'General', type = 'link') => ({ id, title, url, subject, type, createdAt: Date.now() });
+        if (typeof EXAM_DATA !== 'undefined' && EXAM_DATA[template]) {
+          const out = [];
+          const d = EXAM_DATA[template];
+          let i = 0;
+          if (d.official) out.push(resource(`${template}-resource-${i++}`, d.official.label, d.official.url, 'General'));
+          (d.extra || []).forEach(e => out.push(resource(`${template}-resource-${i++}`, e.label, e.url, 'General')));
+          d.channels.forEach(c => out.push(resource(`${template}-resource-${i++}`, c.name, c.url, 'General')));
+          return out;
+        }
         if (EXAM_TEMPLATES[template]?.resources) return EXAM_TEMPLATES[template].resources.map(([title, url, subject = 'General'], index) => resource(`${template}-resource-${index}`, title, url, subject, /drive\.google\.com/i.test(url) ? 'drive' : 'link'));
         const templates = {
           jee: [
@@ -430,6 +415,12 @@
       }
       function templateSyllabus(template) {
         const makeSubject = (name, chapters) => ({ id: uniqueId('subject'), name, chapters: chapters.map(title => ({ id: uniqueId('chapter'), title, status:'not-started' })) });
+        if (Array.isArray(EXAM_TEMPLATES[template]?.syllabus) && EXAM_TEMPLATES[template].syllabus.length) {
+          return clone(EXAM_TEMPLATES[template].syllabus);
+        }
+        if (typeof EXAM_DATA !== 'undefined' && EXAM_DATA[template]?.subjects) {
+          return Object.entries(EXAM_DATA[template].subjects).map(([name, chapters]) => makeSubject(name, chapters));
+        }
         const templateLower = String(template || '').toLowerCase();
         const presets = {
           jee: [
