@@ -2086,7 +2086,7 @@
           const link = activeSpace().links.find(item => item.id === id);
           if (link && confirm(`Remove “${link.name}” from your quick links?`)) { activeSpace().links = activeSpace().links.filter(item => item.id !== id); saveState(); renderLinks(); showToast('Quick link removed.'); }
         }));
-        $('#link-add-tile').addEventListener('click', openLinkDialog);
+        $('#link-add-tile').addEventListener('click', () => openLinkDialog());
         let draggedId = null;
         document.querySelectorAll('.link-tile[data-link-id]').forEach(tile => {
           const openLink = () => {
@@ -2113,11 +2113,50 @@
       }
       let linkEmojiDirty = false;
       function linkDialogType() { return $('#link-type-app').classList.contains('active') ? 'app' : 'web'; }
+      const APP_PRESETS = {
+        desktop: [
+          { name: 'LocalSend', url: 'localsend://' },
+          { name: 'OpenBoard', url: 'openboard://' },
+          { name: 'Spotify', url: 'spotify:' },
+          { name: 'Discord', url: 'discord://' },
+          { name: 'Zoom', url: 'zoommtg://' },
+          { name: 'VS Code', url: 'vscode://' },
+          { name: 'Steam', url: 'steam://' },
+          { name: 'Obsidian', url: 'obsidian://' },
+          { name: 'Notion', url: 'notion://' },
+          { name: 'Figma', url: 'figma://' },
+          { name: 'Slack', url: 'slack://' },
+          { name: 'Telegram', url: 'tg://' }
+        ],
+        web: [
+          { name: 'YouTube', url: 'https://youtube.com' },
+          { name: 'WhatsApp Web', url: 'https://web.whatsapp.com' },
+          { name: 'Spotify Web', url: 'https://open.spotify.com' },
+          { name: 'Netflix', url: 'https://netflix.com' },
+          { name: 'Gmail', url: 'https://mail.google.com' },
+          { name: 'Drive', url: 'https://drive.google.com' },
+          { name: 'ChatGPT', url: 'https://chatgpt.com' },
+          { name: 'Notion', url: 'https://notion.so' },
+          { name: 'Figma', url: 'https://figma.com' },
+          { name: 'Slack', url: 'https://slack.com' }
+        ]
+      };
+      function renderLinkAppPresets() {
+        const list = $('#link-app-preset-list'); if (!list) return;
+        const container = $('#link-app-presets'); if (!container) return;
+        const isDesktop = linkLaunchMode() === 'desktop';
+        const set = isDesktop ? APP_PRESETS.desktop : APP_PRESETS.web;
+        const label = $('#link-app-presets-label');
+        if (label) label.textContent = isDesktop ? 'Popular desktop apps' : 'Popular web apps';
+        container.classList.remove('hidden');
+        list.innerHTML = set.map(p => `<button type="button" class="app-preset" data-app-name="${escapeHTML(p.name)}" data-app-url="${escapeHTML(p.url)}" data-app-launch="${isDesktop ? 'desktop' : 'browser'}">${escapeHTML(p.name)}</button>`).join('');
+      }
       function linkLaunchMode() { return $('#link-launch-desktop').classList.contains('active') ? 'desktop' : 'browser'; }
       function setLinkLaunch(mode) {
         const isDesktop = mode === 'desktop';
         $('#link-launch-desktop').classList.toggle('active', isDesktop);
         $('#link-launch-browser').classList.toggle('active', !isDesktop);
+        renderLinkAppPresets();
         const url = $('#link-url');
         const label = $('#link-url-label');
         const note = $('#app-open-note');
@@ -2126,7 +2165,7 @@
           url.placeholder = 'e.g. localsend://, openboard://, spotify:, zoommtg:';
           if (label) label.textContent = 'App protocol link';
           if (logoField) logoField.classList.add('hidden');
-          if (note) { note.classList.remove('hidden'); note.innerHTML = '💡 <strong>Desktop apps open through their own link protocol.</strong> The app must be installed and support one (e.g. <code>localsend://</code>, <code>openboard://</code>, <code>spotify:</code>, <code>zoommtg:</code>, <code>vscode://</code>, <code>discord:</code>, <code>obsidian:</code>). Clicking the tile will ask your browser to open the app. If nothing happens, the app may not be installed or doesn\u2019t support links.'; }
+          if (note) { note.classList.remove('hidden'); note.innerHTML = '💡 <strong>Desktop apps open through their own link protocol.</strong> Famous apps (Spotify, Discord, VS Code, Zoom, LocalSend…) register one automatically. For <strong>any other app or file on this PC</strong>, use the <strong>Harbor Launch</strong> helper: drop the <code>HarborLaunch</code> folder in C:\, run the .reg once, add your app to <code>harbor-apps.txt</code>, then enter <code>harbor-launch://YourAppName</code> here. Everything stays on your machine.'; }
         } else {
           url.placeholder = isAppType ? 'App URL — opens in a new tab, e.g. https://music.youtube.com' : 'https://example.com';
           if (label) label.textContent = isAppType ? 'App website' : 'Website address';
@@ -2144,6 +2183,8 @@
         setLinkLaunch(isAppType ? linkLaunchMode() : 'browser');
       }
       function openLinkDialog(link = null) {
+        const isLink = Boolean(link && typeof link === 'object' && !(link instanceof Event) && (typeof link.id === 'string' || typeof link.url === 'string'));
+        if (!isLink) link = null;
         closeEmojiPicker(); $('#emoji-search').value = ''; emojiCategory = 'quick';
         linkEmojiDirty = false;
         linkEditingId = link ? link.id : null;
@@ -2246,7 +2287,7 @@
         input.value = ''; saveState(); renderFocus(); showToast('Added to today’s focus.');
       });
       $('#edit-toggle').addEventListener('click', () => { editing = !editing; $('#edit-toggle').classList.toggle('primary', editing); $('#edit-toggle').querySelector('span').textContent = editing ? 'Done editing' : 'Edit links'; renderLinks(); showToast(editing ? 'Drag links to reorder them.' : 'Link editing finished.'); });
-      $('#add-link-button').addEventListener('click', openLinkDialog);
+      $('#add-link-button').addEventListener('click', () => openLinkDialog());
       $('#mistake-review-date').value = localISODate(new Date(Date.now() + 86400000)); setMistakeType('Concept');
       $('#mistake-type-trigger').addEventListener('click', () => toggleCustomMenu('#mistake-type-trigger', '#mistake-type-menu'));
       $('#mistake-type-menu').addEventListener('click', event => { const choice = event.target.closest('[data-mistake-type]'); if (!choice) return; setMistakeType(choice.dataset.mistakeType); closeCustomMenus(); });
@@ -2635,6 +2676,19 @@
       $('#link-type-app').addEventListener('click', () => setLinkType('app'));
       $('#link-launch-browser').addEventListener('click', () => setLinkLaunch('browser'));
       $('#link-launch-desktop').addEventListener('click', () => setLinkLaunch('desktop'));
+      $('#link-app-preset-list').addEventListener('click', event => {
+        const preset = event.target.closest('[data-app-name]');
+        if (!preset) return;
+        const name = preset.dataset.appName;
+        const url = preset.dataset.appUrl;
+        const launch = preset.dataset.appLaunch;
+        if (!$('#link-name').value.trim()) $('#link-name').value = name;
+        $('#link-url').value = url;
+        if (launch === 'desktop' && linkLaunchMode() !== 'desktop') setLinkLaunch('desktop');
+        if (launch === 'browser' && linkLaunchMode() !== 'browser') setLinkLaunch('browser');
+        $('#link-emoji').value = name === 'LocalSend' ? '📤' : name === 'OpenBoard' ? '📋' : name === 'Spotify' ? '🎧' : name === 'Discord' ? '🎮' : name === 'Zoom' ? '🎥' : name === 'VS Code' ? '⌨' : name === 'Steam' ? '🕹' : name === 'Obsidian' ? '🧠' : name === 'Notion' ? '📝' : name === 'Figma' ? '🎨' : name === 'Slack' ? '💬' : name === 'Telegram' ? '✈' : '🔗';
+        linkEmojiDirty = true;
+      });
       $('#link-color').addEventListener('input', renderLinkColourPicker);
       $('#glass-strength').addEventListener('click', () => toggleCustomMenu('#glass-strength', '#glass-menu'));
       $('#glass-menu').addEventListener('click', event => { const choice = event.target.closest('[data-glass-strength]'); if (!choice) return; activeSpace().glass = choice.dataset.glassStrength; saveState(); applyState(); closeCustomMenus(); });
