@@ -3653,3 +3653,21 @@
     box-shadow: none !important;
   }
 }
+
+/* Quick-link App type */
+.link-tile.app-tile .link-icon { position:relative; }
+.link-tile.app-tile .link-icon::after {
+  content:"app"; position:absolute; right:-5px; bottom:-5px;
+  font-size:7px; font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--accent-dark); background:var(--accent);
+  border-radius:6px; padding:2px 4px; line-height:1;
+  box-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+.link-type-picker { display:flex; gap:6px; }
+.link-type-picker button {
+  flex:1; min-height:38px; border:1px solid var(--stroke); border-radius:11px;
+  color:var(--muted); background:rgba(0,0,0,.14); cursor:pointer;
+  font-size:12px; font-weight:800;
+}
+.link-type-picker button.active { color:var(--accent-dark); background:var(--accent); border-color:transparent; }
+.app-open-copy { margin-top:10px; padding:9px 11px; border:1px dashed var(--accent-alpha-40); border-radius:11px; color:var(--muted); font-size:11px; line-height:1.5; }
