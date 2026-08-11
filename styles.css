@@ -89,6 +89,25 @@
     .button.primary:hover { background: var(--accent-light); }
     button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid var(--accent-alpha-60); outline-offset: 2px; }
 
+    /* Labeled header actions: same footprint as icon-button but with a short, always-legible text label. */
+    .icon-button.labeled-action { width: auto; padding: 0 11px; gap: 6px; }
+    .icon-button.labeled-action .action-icon { display: grid; place-items: center; flex: none; font-size: 15px; line-height: 1; }
+    .icon-button.labeled-action .action-label { font-size: 12px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
+    .icon-button.labeled-action.search-action {
+      border-color: var(--accent-alpha-30);
+      background: var(--accent-alpha-15);
+      color: var(--accent);
+    }
+    .icon-button.labeled-action.search-action .action-label { color: var(--ink); }
+    .icon-button.labeled-action.search-action:hover { background: var(--accent-alpha-25); border-color: var(--accent-alpha-45); }
+
+    /* Between the mobile bottom-nav takeover and a comfortably wide desktop, drop back to icon-only
+       so labels never crowd the space switcher or brand. Tooltips/aria-labels still convey purpose. */
+    @media (max-width: 1220px) {
+      .icon-button.labeled-action { width: 39px; padding: 0; gap: 0; }
+      .icon-button.labeled-action .action-label { display: none; }
+    }
+
     .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .68fr); gap: 19px; margin-bottom: 19px; }
     .glass {
       background: linear-gradient(140deg, rgba(255,255,255,.11), rgba(255,255,255,.035));
@@ -3425,7 +3444,7 @@
     /* ─────────────────────────────────────────────────────────────
        Bigger menus: near-fullscreen dialogs on phones, roomier
        command palette on desktop, 1.8x bottom menus.
-       ───────────────────────────────────────────────────────────── */
+       ────────────────────────────────────────────────���──────────── */
     @media (max-width: 900px) {
       /* Near-fullscreen for dialogs EXCEPT the More sheet, which stays a compact bottom sheet */
       dialog:not(#mobile-more-dialog) {
