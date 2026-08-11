@@ -3654,7 +3654,7 @@
    Desktop: Create-a-space dialog — larger, roomier, with a
    scrollable 2-column template grid so all presets are usable.
    (Mobile keeps its own near-fullscreen layout.)
-   ───────────────────────────────────────────────────────────── */
+   ──────────────────────────��────────────────────────────────── */
 @media (min-width: 901px) {
   #space-dialog {
     width: min(760px, calc(100vw - 48px)) !important;
@@ -3832,21 +3832,89 @@ html.millennial-mode:not(.millennial-dark) .bookmark-menu-link { color:#24292f; 
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Desktop: Settings dialog — large like Notion (fills most of
-   the screen, content scrolls inside). Mobile keeps its own size.
+   Settings — categorized navigation + content area.
+   A left rail of category tabs (General / Appearance / Privacy /
+   Data & Backup) on desktop, collapsing to a horizontally
+   scrollable tab strip on tablet/mobile. Only the active
+   category's setting-sections render at once, so the dialog is
+   never a long undifferentiated scroll. All existing setting
+   elements/ids are untouched — this only changes how they are
+   grouped and revealed.
    ───────────────────────────────────────────────────────────── */
+#settings-dialog .settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+#settings-dialog .settings-tab {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: rgba(255,255,255,.045);
+  color: var(--muted);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 730;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+#settings-dialog .settings-tab:hover { color: var(--ink); background: rgba(255,255,255,.09); }
+#settings-dialog .settings-tab.active {
+  color: var(--accent-contrast);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+#settings-dialog .settings-panel[hidden] { display: none; }
+#settings-dialog .settings-panel .setting-section:first-of-type { border-top: 0; padding-top: 5px; }
+html.millennial-mode:not(.millennial-dark) #settings-dialog .settings-tab { background:#f6f8fa; border-color:#8c959f; color:#57606a; }
+html.millennial-mode:not(.millennial-dark) #settings-dialog .settings-tab:hover { background:#eaeef2; color:#24292f; }
+html.millennial-mode.millennial-dark #settings-dialog .settings-tab { background:#161b22; border-color:#30363d; color:#8b949e; }
+html.millennial-mode.millennial-dark #settings-dialog .settings-tab:hover { background:#21262d; color:#c9d1d9; }
+
 @media (min-width: 901px) {
   #settings-dialog {
-    width: min(880px, calc(100vw - 48px)) !important;
-    max-width: 880px !important;
+    width: min(840px, calc(100vw - 48px)) !important;
+    max-width: 840px !important;
     max-height: 86vh !important;
     border-radius: 26px !important;
   }
   #settings-dialog .dialog-body {
     max-height: 86vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 28px 30px 30px !important;
+  }
+  #settings-dialog .settings-tabs {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    width: 190px !important;
+    flex: none !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 0 16px 0 0 !important;
+    border-bottom: 0 !important;
+    border-right: 1px solid rgba(255,255,255,.10) !important;
+  }
+  #settings-dialog .settings-tab { text-align: left !important; padding: 10px 14px !important; }
+  #settings-dialog .settings-layout {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 22px !important;
+    min-height: 0 !important;
+    flex: 1 !important;
+  }
+  #settings-dialog .settings-panels {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 100% !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    padding: 28px 30px 30px !important;
+    padding-right: 4px !important;
   }
   #settings-dialog .setting-section {
     padding: 20px 0;
@@ -3855,6 +3923,17 @@ html.millennial-mode:not(.millennial-dark) .bookmark-menu-link { color:#24292f; 
   #settings-dialog .setting-heading { font-size: 13px; margin-bottom: 13px; }
   #settings-dialog .toggle-row, #settings-dialog .text-size-row, #settings-dialog .millennial-theme-row { padding: 9px 0; }
   #settings-dialog .privacy-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
+@media (max-width: 900px) {
+  #settings-dialog .settings-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+  #settings-dialog .settings-tab { flex: none; }
+}
+@media (max-width: 420px) {
+  #settings-dialog .settings-tab { padding: 7px 11px; font-size: 11.5px; }
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -3968,7 +4047,7 @@ body.modal-open .desktop-sidebar { overscroll-behavior:contain; }
   .space-manager-controls { grid-column:1 / -1 !important; }
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────���───
    Settings + Create Space desktop UI fix
    - Settings becomes a fast multi-column settings board.
    - Create Space gets category chips + larger template area.
@@ -4161,7 +4240,7 @@ body.modal-open .desktop-sidebar { overscroll-behavior:contain; }
 /* ─────────────────────────────────────────────────────────────
    Settings v3 — true columns, no large CSS-grid vertical gaps.
    Sections are grouped into independent columns by app.js.
-   ───────────────────────────────────────────────────────────── */
+   ────────────────────────���──────────────────────────────────── */
 @media (min-width: 901px) {
   #settings-dialog .dialog-body {
     display: block !important;
